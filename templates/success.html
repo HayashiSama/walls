@@ -1,0 +1,77 @@
+<html>
+<head>
+  <title>messages</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+<body>
+<div class="container">
+
+<h1>These are all the messages!</h1>
+<h3> Welcome User : {{id}}</h3>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                 <p>{{message}}</p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+<hr>
+<!-- with all the data we can then construct a more structured output -->
+
+   	<form action='/newmessage', method="post">
+          <div class='form-group'>
+       		<label for="newmessage"> <h5> Post a Message</h5></label>
+            <input type='textarea' name='newmessage'  class="form-control">
+
+         </div>
+         <div class='form-group'>
+         	<button class="btn btn-info" class="form-control"> Add a New Message</button>
+         </div>
+    </form>
+
+<hr>
+{% for message in messages: %}
+	
+	<div class="rounded">
+
+   <p> {{ message['name']  }} - Posted at {{message['timestamp']}}</p>
+   <p>{{message['message']}}</p>
+   {% for y in message['comments'] %}
+  	<p style="margin-left: 40px">{{y}}</p>
+  	{% endfor %}
+  </div>
+  
+   	<form action='/newcomment', method="post">
+          <div class='form-group'>
+          	<input type="hidden" name="messageid" value={{message['id']}}>
+            <input type='textarea' name='newcomment'  class="form-control">
+
+         </div>
+         <div class='form-group'>
+         	<button class="btn btn-info" class="form-control"> Add a New Comment</button>
+         </div>
+    </form>
+    {% if id == message['user_id'] %}
+    		<form action='/deletemessage', method="post">
+         		<div class='form-group'>
+         			<input type="hidden" name="messageid" value={{message['id']}}>
+         			<input type="hidden" name="id" value={{id}}>
+         			<button class="btn btn-info" class="form-control"> Delete Message</button>
+         		</div>
+         	</form>    			
+    {% endif %}
+
+     <hr>
+
+{% endfor %}
+
+{% if debug==True %}
+{{ messages }}
+{% endif %}
+</div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</body>
+</html>
