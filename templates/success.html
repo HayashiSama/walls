@@ -9,6 +9,8 @@
 
 <h1>These are all the messages!</h1>
 <h3> Welcome User : {{id}}</h3>
+       <a href="/logout"><button class="btn btn-info"> Logout</button></a>
+
             {% with messages = get_flashed_messages() %}
               {% if messages %}
                 {% for message in messages %}

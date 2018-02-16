@@ -20,10 +20,13 @@ def index():                         # run query with query_db()
 
 @app.route('/adduser')
 def loadreg():
-    return render_template('adduser.html')
-
+    if session:
+        return render_template('adduser.html')
+    else:
+        return redirect('/logout')
 @app.route('/login', methods=['POST'])
 def login():
+
     query = "SELECT * FROM users WHERE email=:email"
     email = request.form['email']
     password = request.form['password']
@@ -45,7 +48,8 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def create():
-  
+    if not session:
+        return redirect('/logout')
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     password = request.form['password']
@@ -136,6 +140,9 @@ def create():
 #Add new Comment
 @app.route('/newcomment', methods=['POST'])
 def newcomment():
+    if not session:
+        return redirect('/logout')
+    
     messageid=request.form['messageid']
     comment=request.form['newcomment']
     if len(comment) < 1:
@@ -153,6 +160,8 @@ def newcomment():
 #Add new message
 @app.route('/newmessage', methods=['POST'])
 def newmessage():
+    if not session:
+        return redirect('/logout')
     message=request.form['newmessage']
     query = "INSERT INTO messages (users_id,  message, created_at, updated_at) VALUES (:session_id,  :message, Now(), Now())"
     data = {
@@ -164,6 +173,8 @@ def newmessage():
 
 @app.route('/deletemessage', methods=['POST'])
 def delmessage():
+    if not session:
+        return redirect('/logout')
     if(str(session['id']) == request.form['id']):
         #DELETE COMMENTS FIRST
         query = "DELETE FROM comments WHERE messages_id=:message_id"
@@ -187,6 +198,8 @@ def delmessage():
 
 @app.route('/wall')
 def success():
+    if not session:
+        return redirect('/logout')
     query = "SELECT first_name, last_name, message, messages.id, DATE_FORMAT(messages.created_at, '%m/%d/%Y') as date1, users.id as user_id FROM users  JOIN messages ON users.id=messages.users_id ORDER BY messages.created_at Desc"
     result = mysql.query_db(query)                           # run query with query_db()
     msgarray = []
@@ -223,5 +236,10 @@ def success():
 
     print msgarray
     return render_template('success.html', id=session['id'], messages=msgarray, debug=True)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
 
 app.run(debug=True)
